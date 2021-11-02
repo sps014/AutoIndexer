@@ -2,10 +2,13 @@
 
 using System;
 
-Console.WriteLine("Hello, World!");
+new DataStore<int>().AddAt(50,20);
 
-[AutoIndexer]
-void HelloWorld()
+public class DataStore<T>
 {
-    Console.WriteLine("Hello World!");
+    public void AddAt([AutoIndexer] int idx,int y)
+    {
+        Console.WriteLine(idx);
+    }
 }
+

@@ -2,7 +2,7 @@
 
 namespace System
 {
-    [AttributeUsage(AttributeTargets.Method,AllowMultiple =false)]
+    [AttributeUsage(AttributeTargets.Parameter,AllowMultiple =false)]
     public class AutoIndexerAttribute:Attribute
     {
         
