@@ -1,11 +1,30 @@
 {
   "version": 3,
   "targets": {
-    "net6.0": {}
+    "net6.0": {
+      "AutoIndexer/1.0.0": {
+        "type": "project",
+        "framework": ".NETStandard,Version=v2.0",
+        "compile": {
+          "bin/placeholder/AutoIndexer.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/AutoIndexer.dll": {}
+        }
+      }
+    }
   },
-  "libraries": {},
+  "libraries": {
+    "AutoIndexer/1.0.0": {
+      "type": "project",
+      "path": "../AutoIndexer/AutoIndexer.csproj",
+      "msbuildProject": "../AutoIndexer/AutoIndexer.csproj"
+    }
+  },
   "projectFileDependencyGroups": {
-    "net6.0": []
+    "net6.0": [
+      "AutoIndexer >= 1.0.0"
+    ]
   },
   "packageFolders": {
     "C:\\Users\\shive\\.nuget\\packages\\": {},
@@ -38,7 +57,11 @@
       "frameworks": {
         "net6.0": {
           "targetAlias": "net6.0",
-          "projectReferences": {}
+          "projectReferences": {
+            "C:\\Users\\shive\\Desktop\\Projects\\AutoIndexer\\AutoIndexer\\AutoIndexer.csproj": {
+              "projectPath": "C:\\Users\\shive\\Desktop\\Projects\\AutoIndexer\\AutoIndexer\\AutoIndexer.csproj"
+            }
+          }
         }
       },
       "warningProperties": {

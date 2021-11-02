@@ -8,5 +8,6 @@
     </PropertyGroup>
     <ItemGroup>
         <ProjectReference Include="../IndexerGenerator/IndexerGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+        <ProjectReference Include="..\AutoIndexer\AutoIndexer.csproj" />
     </ItemGroup>
 </Project>
