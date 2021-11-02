@@ -58,26 +58,32 @@ namespace IndexerGenerator
 
             foreach(var method in methods)
             {
-
+                //Check if our attrbute is present in method
                 if (!method.GetText().ToString().Contains(ATTRIBUTE_WITH_SYMBOL))
                     continue;
 
-                List<ParameterSyntax> parameters = new();
+                //list of params with attribute
+                List<ParameterSyntax> attrbutedParameters = new();
 
+                //traverse all params of a method
                 foreach(var parameter in method.ParameterList.Parameters)
                 {
+                    //check if we have any attribute matching to ours attribute
                     var hasAttrbute = parameter.AttributeLists
-                        .Any(a => a.Attributes
-                              .Any(at=>at.Name.ToString().Contains(ATTRIBUTE_WITH_SYMBOL))
-                              );
+                        .Any(a => 
+                                a.Attributes.Any(at=>at.Name.ToString().Contains(ATTRIBUTE_WITH_SYMBOL))
+                        );
+
+                    //if we have attribute on param add it
                     if (hasAttrbute)
-                        parameters.Add(parameter);
+                        attrbutedParameters.Add(parameter);
                 }
 
+                //gather information that will be used during generation
                 generatables.Add(new IndexGeneratable
                 {
                     Method = method,
-                    Parameters = parameters,
+                    AttrbutedParameters = attrbutedParameters,
                     Class=method.Parent as ClassDeclarationSyntax
                 });
 
@@ -90,7 +96,7 @@ namespace IndexerGenerator
         {
             public ClassDeclarationSyntax Class { get; set; } 
             public MethodDeclarationSyntax Method { get; set; }
-            public IReadOnlyList<ParameterSyntax> Parameters { get; set; }
+            public IReadOnlyList<ParameterSyntax> AttrbutedParameters { get; set; }
         }
     }
 }
