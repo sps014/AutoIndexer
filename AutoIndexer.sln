@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SampleApp", "SampleApp\SampleApp.csproj", "{37560622-A1C7-408B-A1A7-86A344E52195}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IndexerGenerator", "IndexerGenerator\IndexerGenerator.csproj", "{EDE247D3-66A1-411A-BBB8-F664C4AA8393}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoIndexer", "AutoIndexer\AutoIndexer.csproj", "{1C6FCD07-8A38-449D-B32B-2BB302280099}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{37560622-A1C7-408B-A1A7-86A344E52195}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37560622-A1C7-408B-A1A7-86A344E52195}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37560622-A1C7-408B-A1A7-86A344E52195}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37560622-A1C7-408B-A1A7-86A344E52195}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EDE247D3-66A1-411A-BBB8-F664C4AA8393}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDE247D3-66A1-411A-BBB8-F664C4AA8393}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EDE247D3-66A1-411A-BBB8-F664C4AA8393}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EDE247D3-66A1-411A-BBB8-F664C4AA8393}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C6FCD07-8A38-449D-B32B-2BB302280099}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C6FCD07-8A38-449D-B32B-2BB302280099}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C6FCD07-8A38-449D-B32B-2BB302280099}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C6FCD07-8A38-449D-B32B-2BB302280099}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
