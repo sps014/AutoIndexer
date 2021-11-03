@@ -9,7 +9,7 @@ namespace IndexerGenerator
 {
     internal class IndexAttributeReciever : ISyntaxReceiver
     {
-        public HashSet<AttributeSyntax> AutoIndexerAttribute { get; set; } = new();
+        public HashSet<AttributeSyntax> AutoIndexerAttribute { get;private set; } = new();
         public void OnVisitSyntaxNode(SyntaxNode syntaxNode)
         {
             if(syntaxNode is AttributeSyntax attribute)

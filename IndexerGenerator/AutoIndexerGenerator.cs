@@ -8,14 +8,14 @@ using System.Text.RegularExpressions;
 using System.Text;
 using System.CodeDom.Compiler;
 using System.IO;
+using Microsoft.CodeAnalysis.CSharp;
+using System.Diagnostics.Contracts;
 
 namespace IndexerGenerator
 {
     [Generator]
     public class AutoIndexerGenerator:ISourceGenerator
     {
-        public const string ATTRIBUTE = "AutoIndexer";
-        public const string ATTRIBUTE_WITH_SYMBOL = "[AutoIndexer";
 
         public void Initialize(GeneratorInitializationContext context)
         {
@@ -29,6 +29,7 @@ namespace IndexerGenerator
                 return;
 
             Dictionary<MethodDeclarationSyntax, HashSet<ParameterSyntax>> GroupedParameters = new();
+            Dictionary<ClassDeclarationSyntax,HashSet<MethodDeclarationSyntax>> GroupedMethods= new();
 
             foreach (var att in reciever.AutoIndexerAttribute)
             {
@@ -44,20 +45,45 @@ namespace IndexerGenerator
                 var method=ParentOfType<MethodDeclarationSyntax,ParameterListSyntax>(paramList);
                 if (method == null) continue;
 
+
                 var @class=ParentOfType<ClassDeclarationSyntax,MethodDeclarationSyntax>(method);
                 if (@class == null) continue;
 
-                if(GroupedParameters.ContainsKey(method))
+
+                if (GroupedMethods.ContainsKey(@class))
+                    GroupedMethods[@class].Add(method);
+                else
+                    GroupedMethods.Add(@class, new HashSet<MethodDeclarationSyntax> { method });
+
+                if (GroupedParameters.ContainsKey(method))
                     GroupedParameters[method].Add(param);
                 else
                     GroupedParameters.Add(method, new HashSet<ParameterSyntax> { param });
 
-                Console.WriteLine(@class.Identifier.ToString());
-
-
             }
 
+            GenerateForClass(GroupedMethods, context);
             
+        }
+
+        private void GenerateForClass(IReadOnlyDictionary<ClassDeclarationSyntax,HashSet<MethodDeclarationSyntax>> classes,GeneratorExecutionContext context)
+        {
+            foreach(var @class in classes)
+            {
+                Console.WriteLine(GetNamespace(context, @class.Key));
+            }
+        }
+        private string GetNamespace(GeneratorExecutionContext context,ClassDeclarationSyntax node)
+        {
+            var parent = node.Parent;
+            while (parent.IsKind(SyntaxKind.ClassDeclaration))
+            {
+                var parentClass = parent as ClassDeclarationSyntax;
+                parent = parent.Parent;
+            }
+            if(parent is NamespaceDeclarationSyntax ns)
+                return ns.Name.ToString();
+            return null;
         }
 
         private T ParentOfType<T,S>(S node) where T:SyntaxNode where S:SyntaxNode
