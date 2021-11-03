@@ -19,78 +19,54 @@ namespace IndexerGenerator
 
         public void Initialize(GeneratorInitializationContext context)
         {
+            context.RegisterForSyntaxNotifications(()=>new IndexAttributeReciever());
         }
 
         public void Execute(GeneratorExecutionContext context)
         {
-            //get all the c# syntax trees from context compilation unit
-            var allTrees = context.Compilation.SyntaxTrees
-                .Where(t=>t.GetRoot().Language.Equals("C#"));
 
-            var classes=GetAllClasses(allTrees);
-            var methods=GetAllMethods(classes);
+            if (context.SyntaxReceiver is not IndexAttributeReciever reciever)
+                return;
 
-            var @params=GetAllAttrbutedParamList(methods).ToList();
-            Console.WriteLine(@params[0]);
-        }
+            Dictionary<MethodDeclarationSyntax, HashSet<ParameterSyntax>> GroupedParameters = new();
 
-        private IEnumerable<ClassDeclarationSyntax> GetAllClasses(IEnumerable<SyntaxTree> trees)
-        {
-            List<ClassDeclarationSyntax> classes = new List<ClassDeclarationSyntax>();
-            foreach(var t in trees)
+            foreach (var att in reciever.AutoIndexerAttribute)
             {
-                if (!t.GetRoot().GetText().ToString().Contains(ATTRIBUTE_WITH_SYMBOL))
-                    continue;
-                classes.AddRange(t.GetRoot().DescendantNodes().OfType<ClassDeclarationSyntax>());
-            }
-            return classes;
-        }
-        private IEnumerable<MethodDeclarationSyntax> GetAllMethods(IEnumerable<ClassDeclarationSyntax> @class)
-        {
-            var methods=new List<MethodDeclarationSyntax>();
-            foreach(var c in @class)
-                methods.AddRange(c.Members.OfType<MethodDeclarationSyntax>());
-            return methods;
-        }
-        private IEnumerable<IndexGeneratable> GetAllAttrbutedParamList(IEnumerable<MethodDeclarationSyntax> methods)
-        {
-            var generatables= new List<IndexGeneratable>();
+                var attributelist = ParentOfType<AttributeListSyntax,AttributeSyntax>(att);
+                if (attributelist == null) continue;
 
-            foreach(var method in methods)
-            {
-                //Check if our attrbute is present in method
-                if (!method.GetText().ToString().Contains(ATTRIBUTE_WITH_SYMBOL))
-                    continue;
+                var param = ParentOfType<ParameterSyntax,AttributeListSyntax>(attributelist);
+                if (param == null) continue;
 
-                //list of params with attribute
-                List<ParameterSyntax> attrbutedParameters = new();
+                var paramList = ParentOfType<ParameterListSyntax,ParameterSyntax>(param);
+                if (paramList == null) continue;
 
-                //traverse all params of a method
-                foreach(var parameter in method.ParameterList.Parameters)
-                {
-                    //check if we have any attribute matching to ours attribute
-                    var hasAttrbute = parameter.AttributeLists
-                        .Any(a => 
-                                a.Attributes.Any(at=>at.Name.ToString().Contains(ATTRIBUTE_WITH_SYMBOL))
-                        );
+                var method=ParentOfType<MethodDeclarationSyntax,ParameterListSyntax>(paramList);
+                if (method == null) continue;
 
-                    //if we have attribute on param add it
-                    if (hasAttrbute)
-                        attrbutedParameters.Add(parameter);
-                }
+                var @class=ParentOfType<ClassDeclarationSyntax,MethodDeclarationSyntax>(method);
+                if (@class == null) continue;
 
-                //gather information that will be used during generation
-                generatables.Add(new IndexGeneratable
-                {
-                    Method = method,
-                    AttrbutedParameters = attrbutedParameters,
-                    Class=method.Parent as ClassDeclarationSyntax
-                });
+                if(GroupedParameters.ContainsKey(method))
+                    GroupedParameters[method].Add(param);
+                else
+                    GroupedParameters.Add(method, new HashSet<ParameterSyntax> { param });
+
+                Console.WriteLine(@class.Identifier.ToString());
+
 
             }
 
-            return generatables;
+            
         }
+
+        private T ParentOfType<T,S>(S node) where T:SyntaxNode where S:SyntaxNode
+        {
+            if(node.Parent is T parent)
+                return parent;
+            return null;
+        }
+
 
         public record IndexGeneratable
         {
