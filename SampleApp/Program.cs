@@ -10,11 +10,13 @@ namespace Try
     public class DataStore<T>
     {
         public int Count { get; set; }
-        public void AddAt([AutoIndexer] int idx, [AutoIndexer] int y)
+        public void AddAt([AutoIndexer] int idx, 
+            [AutoIndexer] int y)
         {
             Console.WriteLine(idx);
         }
-        public void RemoveAt([AutoIndexer] int idx, [AutoIndexer] double z,string k,float f)
+        public void RemoveAt([AutoIndexer] int idx,
+            [AutoIndexer] double z,string k,float f)
         {
             Console.WriteLine(idx);
         }
