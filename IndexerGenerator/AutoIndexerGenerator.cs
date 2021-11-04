@@ -98,7 +98,7 @@ namespace IndexerGenerator
 
                     var parametersNew = GetNewParameters(method, indexedParameters[method],oldClassName);
                     //create function signature
-                    writer.Write($"public static {returnType} {methodName}{@class.Key.TypeParameterList}(");
+                    writer.Write($"public static {returnType} {methodName}{GetGenericTypes(@class.Key,method)}(");
                     writer.Write(parametersNew);
                     writer.Write(")");
                     writer.WriteLine("=>");
@@ -173,6 +173,22 @@ namespace IndexerGenerator
         public string GetClassName(ClassDeclarationSyntax @class)
         {
             return @class.Identifier.Text+@class.TypeParameterList.ToString();
+        }
+        public string GetGenericTypes(ClassDeclarationSyntax @class,MethodDeclarationSyntax method)
+        {
+            string res = "<";
+            if(@class.TypeParameterList != null)
+            foreach (var item in @class.TypeParameterList.Parameters)
+            {
+                res += item.Identifier.ValueText+",";
+            }
+            if (method.TypeParameterList != null)
+                foreach (var item in method.TypeParameterList.Parameters)
+                res += item.Identifier.ValueText + ",";
+            res=res.TrimEnd(',');
+            if(res.Length > 1)
+                return res+">";
+            return string.Empty;
         }
 
         private T ParentOfType<T,S>(S node) where T:SyntaxNode where S:SyntaxNode
