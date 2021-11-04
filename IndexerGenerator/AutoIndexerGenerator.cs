@@ -49,6 +49,9 @@ namespace IndexerGenerator
                 var @class=ParentOfType<ClassDeclarationSyntax,MethodDeclarationSyntax>(method);
                 if (@class == null) continue;
 
+                var @namespace=GetNamespace(@class);
+                if (string.IsNullOrWhiteSpace(@namespace)) continue;
+
 
                 if (GroupedMethods.ContainsKey(@class))
                     GroupedMethods[@class].Add(method);
@@ -62,23 +65,83 @@ namespace IndexerGenerator
 
             }
 
-            GenerateForClass(GroupedMethods, context);
+            GenerateForClass(GroupedMethods,GroupedParameters,context);
             
         }
 
-        private void GenerateForClass(IReadOnlyDictionary<ClassDeclarationSyntax,HashSet<MethodDeclarationSyntax>> classes,GeneratorExecutionContext context)
+        private void GenerateForClass(IReadOnlyDictionary<ClassDeclarationSyntax,HashSet<MethodDeclarationSyntax>> classes
+            ,IReadOnlyDictionary<MethodDeclarationSyntax,HashSet<ParameterSyntax>> indexedParameters
+            ,GeneratorExecutionContext context)
         {
-            foreach(var @class in classes)
+            int i = 0;
+            foreach (var @class in classes)
             {
-                Console.WriteLine(GetNamespace(context, @class.Key));
+                using StringWriter sw = new StringWriter();
+                using IndentedTextWriter writer = new IndentedTextWriter(sw);
+
+                var @namespace = GetNamespace(@class.Key);
+                string className = $"{@class.Key.Identifier}Extn{i++}";
+
+                //add namespace
+                writer.WriteLine($"namespace {@namespace};");
+                //add class
+                writer.WriteLine($"public static class {className}");
+                writer.WriteLine("{");
+                writer.Indent++;
+
+                //add extension methods
+                foreach(var method in @class.Value)
+                {
+                    var methodName = method.Identifier.ValueText;
+                    bool hasReturn = !method.ReturnType.GetText().ToString().Equals("void");
+                    string returnType=method.ReturnType.GetText().ToString();
+
+                    var parametersNew = GetNewParameters(method, indexedParameters[method],@class.Key.Identifier.ValueText);
+                    //create function signature
+                    writer.Write($"public static {returnType} {methodName}(");
+                    writer.Write(parametersNew);
+                    writer.WriteLine(")");
+                    writer.WriteLine("{");
+                    writer.Indent++;
+                    //write Body of method
+
+                    writer.Indent--;
+                    writer.WriteLine("}");
+                }
+
+                writer.Indent--;
+                writer.WriteLine("}");
+
+
+                Console.WriteLine(sw.ToString());
+                context.AddSource(className, SourceText.From(sw.ToString(), Encoding.UTF8));
             }
         }
-        private string GetNamespace(GeneratorExecutionContext context,ClassDeclarationSyntax node)
+        private string GetNewParameters(MethodDeclarationSyntax method,HashSet<ParameterSyntax> indexedParameters,string className)
+        {
+            string param = $"this {className} @type,";
+            int ct = method.ParameterList.Parameters.Count;
+            int i = 0;
+            foreach (var p in method.ParameterList.Parameters)
+            {
+                if (indexedParameters.Contains(p))
+                    param += $"Index {p.Identifier.ValueText}";
+                else
+                    param += $"{p.Type.GetText()} {p.Identifier.ValueText}";
+
+                if (i != ct - 1)
+                    param += ", ";
+
+                i++;
+            }
+
+            return param;
+        }
+        private string GetNamespace(ClassDeclarationSyntax node)
         {
             var parent = node.Parent;
             while (parent.IsKind(SyntaxKind.ClassDeclaration))
             {
-                var parentClass = parent as ClassDeclarationSyntax;
                 parent = parent.Parent;
             }
             if(parent is NamespaceDeclarationSyntax ns)

@@ -13,7 +13,7 @@ namespace Try
         {
             Console.WriteLine(idx);
         }
-        public void AddAt([AutoIndexer] int idx, [AutoIndexer] double z)
+        public void RemoveAt([AutoIndexer] int idx, [AutoIndexer] double z,string k,float f)
         {
             Console.WriteLine(idx);
         }
