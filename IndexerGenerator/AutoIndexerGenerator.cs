@@ -93,20 +93,22 @@ namespace IndexerGenerator
                 foreach(var method in @class.Value)
                 {
                     var methodName = method.Identifier.ValueText;
-                    bool hasReturn = !method.ReturnType.GetText().ToString().Equals("void");
                     string returnType=method.ReturnType.GetText().ToString();
 
                     var parametersNew = GetNewParameters(method, indexedParameters[method],@class.Key.Identifier.ValueText);
                     //create function signature
                     writer.Write($"public static {returnType} {methodName}(");
                     writer.Write(parametersNew);
-                    writer.WriteLine(")");
-                    writer.WriteLine("{");
+                    writer.Write(")");
+                    writer.WriteLine("=>");
                     writer.Indent++;
                     //write Body of method
-
+                    writer.Write($"@type.{methodName}(");
+                    var actualParams = GetNewActualParameters(method, indexedParameters[method]);
+                    writer.Write(actualParams);
+                    writer.WriteLine(");");
                     writer.Indent--;
-                    writer.WriteLine("}");
+                    writer.WriteLine();
                 }
 
                 writer.Indent--;
@@ -128,6 +130,26 @@ namespace IndexerGenerator
                     param += $"Index {p.Identifier.ValueText}";
                 else
                     param += $"{p.Type.GetText()} {p.Identifier.ValueText}";
+
+                if (i != ct - 1)
+                    param += ", ";
+
+                i++;
+            }
+
+            return param;
+        }
+        private string GetNewActualParameters(MethodDeclarationSyntax method, HashSet<ParameterSyntax> indexedParameters)
+        {
+            string param = "";
+            int ct = method.ParameterList.Parameters.Count;
+            int i = 0;
+            foreach (var p in method.ParameterList.Parameters)
+            {
+                if (indexedParameters.Contains(p))
+                    param += $"{p.Identifier.ValueText}.GetOffset(@type.Count)";
+                else
+                    param += $"{p.Identifier.ValueText}";
 
                 if (i != ct - 1)
                     param += ", ";
