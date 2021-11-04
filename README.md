@@ -1,6 +1,6 @@
 # AutoIndexer
  
- A rapid project to generate Index overload extension method compile time with Source Generator.
+ A rapid way to generate Index overload extension method compile time with Source Generator.
 
 ### ⚠️ this is proof of concept not actual product.
 1. It is incomplete 
