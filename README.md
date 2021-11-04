@@ -1,8 +1,8 @@
 # AutoIndexer
  
-A rapid test to generate Index overload extension method. 
+ A rapid project to generate Index overload extension method compile time with Source Generator.
 
-### this is proof of concept not actual product.
+### ⚠️ this is proof of concept not actual product.
 1. It is incomplete 
 2. Not all scenarios are covered as of now
 3. No error handling and user warning 
