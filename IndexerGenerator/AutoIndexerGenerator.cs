@@ -81,7 +81,7 @@ namespace IndexerGenerator
 
                 var @namespace = GetNamespace(@class.Key);
                 string className = $"{@class.Key.Identifier}Extn{i++}";
-
+                string oldClassName = GetClassName(@class.Key);
                 //add namespace
                 writer.WriteLine($"namespace {@namespace};");
                 //add class
@@ -89,15 +89,16 @@ namespace IndexerGenerator
                 writer.WriteLine("{");
                 writer.Indent++;
 
+
                 //add extension methods
                 foreach(var method in @class.Value)
                 {
                     var methodName = method.Identifier.ValueText;
                     string returnType=method.ReturnType.GetText().ToString();
 
-                    var parametersNew = GetNewParameters(method, indexedParameters[method],@class.Key.Identifier.ValueText);
+                    var parametersNew = GetNewParameters(method, indexedParameters[method],oldClassName);
                     //create function signature
-                    writer.Write($"public static {returnType} {methodName}(");
+                    writer.Write($"public static {returnType} {methodName}{@class.Key.TypeParameterList}(");
                     writer.Write(parametersNew);
                     writer.Write(")");
                     writer.WriteLine("=>");
@@ -113,7 +114,6 @@ namespace IndexerGenerator
 
                 writer.Indent--;
                 writer.WriteLine("}");
-
 
                 Console.WriteLine(sw.ToString());
                 context.AddSource(className, SourceText.From(sw.ToString(), Encoding.UTF8));
@@ -169,6 +169,10 @@ namespace IndexerGenerator
             if(parent is NamespaceDeclarationSyntax ns)
                 return ns.Name.ToString();
             return null;
+        }
+        public string GetClassName(ClassDeclarationSyntax @class)
+        {
+            return @class.Identifier.Text+@class.TypeParameterList.ToString();
         }
 
         private T ParentOfType<T,S>(S node) where T:SyntaxNode where S:SyntaxNode

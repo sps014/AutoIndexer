@@ -9,6 +9,7 @@ namespace Try
 {
     public class DataStore<T>
     {
+        public int Count { get; set; }
         public void AddAt([AutoIndexer] int idx, [AutoIndexer] int y)
         {
             Console.WriteLine(idx);
